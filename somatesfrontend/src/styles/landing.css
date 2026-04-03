@@ -1,0 +1,82 @@
+/* Global Reset */
+body {
+  margin: 0;
+  font-family: "Poppins", sans-serif;
+  background: #0f172a;
+  color: white;
+}
+
+/* Hero Section */
+.hero {
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  text-align: center;
+  background: linear-gradient(135deg, #6366f1, #06b6d4);
+}
+
+.hero h1 {
+  font-size: 3rem;
+  margin-bottom: 10px;
+}
+
+.hero p {
+  font-size: 1.2rem;
+  opacity: 0.9;
+}
+
+.hero button {
+  margin-top: 20px;
+  padding: 12px 24px;
+  border: none;
+  background: white;
+  color: #111827;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: 0.3s;
+}
+
+.hero button:hover {
+  background: #e5e7eb;
+}
+
+/* Features Section */
+.features {
+  padding: 60px 20px;
+  text-align: center;
+  background: #111827;
+}
+
+.features h2 {
+  margin-bottom: 30px;
+  font-size: 2rem;
+}
+
+.feature-grid {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+}
+
+.feature-card {
+  background: #1f2937;
+  padding: 20px;
+  border-radius: 12px;
+  width: 250px;
+  transition: 0.3s;
+}
+
+.feature-card:hover {
+  transform: translateY(-5px);
+}
+
+/* Footer */
+.footer {
+  padding: 20px;
+  text-align: center;
+  background: #020617;
+  font-size: 0.9rem;
+}

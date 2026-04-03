@@ -1,0 +1,26 @@
+version: "3.9"
+services:
+  db:
+    image: postgres:alpine
+    container_name: postgres
+    restart: always
+    environment:
+      POSTGRES_DB: somatedb
+      POSTGRES_USER: rohit
+      POSTGRES_PASSWORD: rohit123
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./data:/var/lib/postgresql
+
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -d $${DB_NAME} -U $${DB_USER}"]
+      interval: 10s
+      timeout: 30s
+      retries: 5
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8080:8080

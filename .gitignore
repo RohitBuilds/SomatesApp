@@ -1,0 +1,34 @@
+# ======================
+# 🔒 Environment files
+# ======================
+.env
+somatesbackend/.env
+somatesfrontend/.env
+
+# ======================
+# 📦 Node (Frontend)
+# ======================
+node_modules/
+somatesfrontend/node_modules/
+
+# ======================
+# 🐍 Python (Backend)
+# ======================
+__pycache__/
+*.pyc
+venv/
+somatesbackend/venv/
+
+# ======================
+# 🏗️ Build files
+# ======================
+dist/
+build/
+somatesfrontend/dist/
+somatesfrontend/build/
+
+# ======================
+# 💻 OS files
+# ======================
+.DS_Store
+Thumbs.db
