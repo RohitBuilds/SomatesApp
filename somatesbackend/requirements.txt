@@ -1,5 +1,5 @@
 cloudinary==1.44.1
-fastapi==0.95.2
+fastapi>=0.116.0
 langchain_core==1.2.25
 langchain_mistralai==1.1.2
 passlib[bcrypt]==1.7.4
