@@ -88,11 +88,14 @@ app = FastAPI(title="Somates App Backend")
 def on_startup():
     try:
         print("Starting up: creating tables...")
+        from application.utils.db import create_tables
         create_tables()
         print("Startup finished successfully")
     except Exception as e:
+        import traceback
         print("Startup ERROR:", e)
-        raise e  # re-raise so we can see the error in logs
+        traceback.print_exc()  # Shows full stack trace
+        raise e  # re-raise so Render logs it
 
 # --------------------
 # CORS settings
