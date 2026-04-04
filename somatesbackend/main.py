@@ -21,7 +21,10 @@ app=FastAPI()
 
 @app.on_event("startup")
 def on_startup():
+    print("Creating tables...")
     Base.metadata.create_all(bind=sync_engine)
+    print("Tables created")
+
 
 origins = [
     "http://localhost:5173",  
