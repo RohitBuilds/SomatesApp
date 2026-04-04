@@ -23,6 +23,7 @@ app=FastAPI()
 
 origins = [
     "http://localhost:5173",  
+    "https://somatesappbackend.onrender.com",
 ]
 
 app.include_router(signup_router)
