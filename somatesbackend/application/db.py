@@ -53,44 +53,59 @@ from sqlalchemy.orm import sessionmaker, declarative_base
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from dotenv import load_dotenv
 
-# Load .env
+# --------------------
+# Load environment variables
+# --------------------
 load_dotenv()
-
-# Get DB URL
 DATABASE_URL = os.getenv("DATABASE_URL")
 print("DATABASE_URL:", DATABASE_URL)
 
 # --------------------
-# Sync engine (for table creation)
-# --------------------
-sync_engine = create_engine(
-    DATABASE_URL.replace("+asyncpg", ""), echo=True
-)
-SessionLocal = sessionmaker(
-    bind=sync_engine, autoflush=False, autocommit=False
-)
-
-# --------------------
-# Base
+# Base class
 # --------------------
 Base = declarative_base()
 
 # --------------------
-# Create tables on startup
+# Sync engine for table creation
 # --------------------
-def create_tables():
-    Base.metadata.create_all(bind=sync_engine)
+# Remove +asyncpg for sync engine
+sync_engine = create_engine(
+    DATABASE_URL.replace("+asyncpg", ""), echo=True
+)
 
-# --------------------
-# Async engine (for normal queries)
-# --------------------
-async_engine = create_async_engine(DATABASE_URL, echo=True)
-async_session = sessionmaker(
-    async_engine, expire_on_commit=False, class_=AsyncSession
+# Session for sync operations (like create_all)
+SessionLocal = sessionmaker(
+    bind=sync_engine,
+    autoflush=False,
+    autocommit=False
 )
 
 # --------------------
-# Dependencies
+# Async engine for normal DB operations
+# --------------------
+async_engine = create_async_engine(
+    DATABASE_URL,
+    echo=True
+)
+
+async_session = sessionmaker(
+    bind=async_engine,
+    class_=AsyncSession,
+    expire_on_commit=False
+)
+
+# --------------------
+# Function to create tables (call in startup)
+# --------------------
+def create_tables():
+    try:
+        Base.metadata.create_all(bind=sync_engine)
+        print("Tables created successfully")
+    except Exception as e:
+        print("Error creating tables:", e)
+
+# --------------------
+# Dependency: sync session (rarely used)
 # --------------------
 def get_db():
     db = SessionLocal()
@@ -99,6 +114,9 @@ def get_db():
     finally:
         db.close()
 
+# --------------------
+# Dependency: async session (for FastAPI routes)
+# --------------------
 async def get_async_session():
     async with async_session() as session:
         yield session
