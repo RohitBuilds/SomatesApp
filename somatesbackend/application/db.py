@@ -59,19 +59,26 @@ from dotenv import load_dotenv
 # --------------------
 load_dotenv()
 DATABASE_URL = os.getenv("DATABASE_URL")
-print("DATABASE_URL:", DATABASE_URL)
+
+if not DATABASE_URL:
+    raise ValueError("DATABASE_URL is not set in environment variables!")
+
+print("DATABASE_URL loaded successfully")  # Avoid printing passwords in production
 
 # --------------------
-# Base class
+# Base class for models
 # --------------------
 Base = declarative_base()
 
 # --------------------
-# Sync engine for table creation
+# Sync engine (for table creation at startup)
 # --------------------
+# Remove +asyncpg for sync engine
 sync_engine = create_engine(
-    DATABASE_URL.replace("+asyncpg", ""), echo=True
+    DATABASE_URL.replace("+asyncpg", ""),
+    echo=True
 )
+
 SessionLocal = sessionmaker(
     bind=sync_engine,
     autoflush=False,
@@ -79,12 +86,13 @@ SessionLocal = sessionmaker(
 )
 
 # --------------------
-# Async engine for normal DB operations
+# Async engine (for async DB operations in FastAPI routes)
 # --------------------
 async_engine = create_async_engine(
     DATABASE_URL,
     echo=True
 )
+
 async_session = sessionmaker(
     bind=async_engine,
     class_=AsyncSession,
@@ -92,7 +100,7 @@ async_session = sessionmaker(
 )
 
 # --------------------
-# Function to create tables (call on startup)
+# Create tables function (call in FastAPI startup)
 # --------------------
 def create_tables():
     try:
@@ -102,7 +110,7 @@ def create_tables():
         print("Error creating tables:", e)
 
 # --------------------
-# Dependency: sync session (for rare sync usage)
+# Dependency: sync session (rarely used)
 # --------------------
 def get_db():
     db = SessionLocal()
@@ -112,7 +120,7 @@ def get_db():
         db.close()
 
 # --------------------
-# Dependency: async session (for FastAPI routes)
+# Dependency: async session (use this in FastAPI routes)
 # --------------------
 async def get_async_session():
     async with async_session() as session:
