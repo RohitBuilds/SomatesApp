@@ -60,7 +60,6 @@
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.staticfiles import StaticFiles
 
 # Routers
 from application.routes.signup import router as signup_router
@@ -76,20 +75,27 @@ from application.routes.messageroute import router as message_route
 from application.routes.websocket import router as websocket_router
 from application.routes.somateChatbot import router as somatebot
 from application.routes.privacy_req import router as privacy_router
-from application.db import Base, sync_engine
+
+# Database
+from application.db import create_tables
 
 app = FastAPI(title="Somates App Backend")
 
+# --------------------
+# Startup event
+# --------------------
 @app.on_event("startup")
 def on_startup():
     print("Starting up: Creating tables if they don't exist...")
     try:
-        Base.metadata.create_all(bind=sync_engine)
+        create_tables()  # Use the function from db.py
         print("Tables created successfully.")
     except Exception as e:
         print("Error creating tables:", e)
 
-
+# --------------------
+# CORS settings
+# --------------------
 origins = [
     "http://localhost:5173",
     "https://somates-app.vercel.app",
@@ -97,29 +103,37 @@ origins = [
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,  # restrict to your frontend URLs
+    allow_origins=origins,  # Only allow your frontend URLs
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
+# --------------------
+# Include all routers
+# --------------------
+routers = [
+    signup_router,
+    profile_router,
+    follower_router,
+    post_route,
+    like_route,
+    comment_route,
+    notification_route,
+    searching_route,
+    story_route,
+    message_route,
+    websocket_router,
+    somatebot,
+    privacy_router,
+]
 
-app.include_router(signup_router)
-app.include_router(profile_router)
-app.include_router(follower_router)
-app.include_router(post_route)
-app.include_router(like_route)
-app.include_router(comment_route)
-app.include_router(notification_route)
-app.include_router(searching_route)
-app.include_router(story_route)
-app.include_router(message_route)
-app.include_router(websocket_router)
-app.include_router(somatebot)
-app.include_router(privacy_router)
+for router in routers:
+    app.include_router(router)
 
-
+# --------------------
+# Simple home route
+# --------------------
 @app.get("/home")
 def homeroute():
     return {"message": "Welcome to Somates App"}
-
