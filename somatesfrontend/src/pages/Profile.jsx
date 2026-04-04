@@ -2,7 +2,7 @@
 import { useEffect, useState, useRef, useCallback } from "react";
 import { useParams } from "react-router-dom";
 
-const BASE_URL = "http://localhost:8000";
+const BASE_URL = "https://somatesappbackend.onrender.com";
 
 async function api(endpoint, options = {}) {
   const isFormData = options.body instanceof FormData;
