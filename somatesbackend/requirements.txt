@@ -1,8 +1,9 @@
-cloudinary==1.44.1
-fastapi>=0.116.0
-langchain_core==1.2.25
-langchain_mistralai==1.1.2
+cloudinary==1.36.0
+fastapi==0.111.0
+langchain-core==0.3.59
+langchain-mistralai==0.2.10
 passlib[bcrypt]==1.7.4
+bcrypt==4.0.1
 pydantic>=2.7.4,<3.0.0
 python-dotenv==1.2.2
 SQLAlchemy==2.0.39
