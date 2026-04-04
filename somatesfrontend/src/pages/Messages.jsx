@@ -1,6 +1,6 @@
 
 import { useEffect, useState, useRef } from "react";
-const BASE_URL = "http://localhost:8000";
+const BASE_URL = "https://somatesappbackend.onrender.com";
 
 async function api(endpoint, options = {}) {
   const res = await fetch(`${BASE_URL}${endpoint}`, {
