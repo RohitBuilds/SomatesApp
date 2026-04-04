@@ -23,7 +23,7 @@ app=FastAPI()
 
 origins = [
     "http://localhost:5173",  
-    "https://somatesappbackend.onrender.com",
+    "https://somates-app.vercel.app",
 ]
 
 app.include_router(signup_router)
