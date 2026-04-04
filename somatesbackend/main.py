@@ -17,9 +17,11 @@ from application.db import Base, sync_engine
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 
-Base.metadata.create_all(bind=sync_engine )
-
 app=FastAPI()
+
+@app.on_event("startup")
+def on_startup():
+    Base.metadata.create_all(bind=sync_engine)
 
 origins = [
     "http://localhost:5173",  
