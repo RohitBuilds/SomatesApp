@@ -86,12 +86,13 @@ app = FastAPI(title="Somates App Backend")
 # --------------------
 @app.on_event("startup")
 def on_startup():
-    print("Starting up: Creating tables if they don't exist...")
     try:
-        create_tables()  # Use the function from db.py
-        print("Tables created successfully.")
+        print("Starting up: creating tables...")
+        create_tables()
+        print("Startup finished successfully")
     except Exception as e:
-        print("Error creating tables:", e)
+        print("Startup ERROR:", e)
+        raise e  # re-raise so we can see the error in logs
 
 # --------------------
 # CORS settings
