@@ -224,29 +224,67 @@ def edit_profile(
 
 
 # ── POST /profile/upload-picture ──────────────────────────────────────────
+# @router.post("/profile/upload-picture")
+# def upload_profile_picture(
+#     request: Request,
+#     file: UploadFile = File(...),
+#     db: Session = Depends(get_db)
+# ):
+#     user_id = get_current_user_id(request)
+
+#     try:
+#         image_url = upload_image(file, folder="profiles")
+#     except Exception as e:
+#         raise HTTPException(status_code=500, detail=f"Cloudinary upload failed: {str(e)}")
+
+#     user = db.query(User).filter(User.id == user_id).first()
+#     if not user:
+#         raise HTTPException(status_code=404, detail="User not found")
+
+#     if hasattr(user, "profile_picture"):
+#         user.profile_picture = image_url
+#     if hasattr(user, "profile_pic"):
+#         user.profile_pic = image_url
+
+#     db.add(user)
+#     db.commit()
+#     db.refresh(user)
+#     return {"profilepic": get_pic(user)}
+
 @router.post("/profile/upload-picture")
 def upload_profile_picture(
     request: Request,
     file: UploadFile = File(...),
     db: Session = Depends(get_db)
 ):
+    # Step 1: Auth check
     user_id = get_current_user_id(request)
 
+    # Step 2: Validate file type
+    if file.content_type not in ["image/jpeg", "image/png", "image/webp", "image/gif"]:
+        raise HTTPException(status_code=400, detail="Only image files are allowed")
+
+    # Step 3: Upload to Cloudinary
     try:
-        image_url = upload_image(file, folder="profiles")
+        image_url = upload_image(file, folder="somates_profiles")
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Cloudinary upload failed: {str(e)}")
 
+    # Step 4: Save URL to DB
     user = db.query(User).filter(User.id == user_id).first()
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
 
-    if hasattr(user, "profile_picture"):
-        user.profile_picture = image_url
+    # Update whichever column exists in your User model
     if hasattr(user, "profile_pic"):
         user.profile_pic = image_url
+    elif hasattr(user, "profile_picture"):
+        user.profile_picture = image_url
 
-    db.add(user)
     db.commit()
     db.refresh(user)
-    return {"profilepic": get_pic(user)}
+
+    return {
+        "message": "Profile picture updated successfully",
+        "profilepic": get_pic(user)
+    }
