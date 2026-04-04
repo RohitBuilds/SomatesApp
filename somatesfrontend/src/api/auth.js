@@ -1,5 +1,5 @@
 import axios from "axios";
-const BASE_URL = "http://localhost:8000";
+const BASE_URL = "https://somatesappbackend.onrender.com";
 
 export const loginUser = async (email, password) => {
   console.log("Sending login:", email, password); // debug
@@ -10,7 +10,7 @@ export const loginUser = async (email, password) => {
       headers: {
         "Content-Type": "application/json"
       },
-      credentials: "include", // ✅ important to store session cookie
+      credentials: "include", 
       body: JSON.stringify({ email, password })
     });
 
