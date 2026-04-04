@@ -26,6 +26,14 @@ origins = [
     "https://somates-app.vercel.app",
 ]
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],  
+    allow_headers=["*"],
+)
+
 app.include_router(signup_router)
 app.include_router(profile_router)
 app.include_router(follower_router)
@@ -44,10 +52,3 @@ app.include_router(privacy_router)
 def homeroute():
     return {'Welcome to somates app'}
 
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=origins,
-    allow_credentials=True,
-    allow_methods=["*"],  
-    allow_headers=["*"],
-)
