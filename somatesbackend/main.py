@@ -57,8 +57,61 @@
 # def homeroute():
 #     return {'Welcome to somates app'}
 
+# from fastapi import FastAPI
+# from fastapi.middleware.cors import CORSMiddleware
+# from application.routes.signup import router as signup_router
+# from application.routes.profile import router as profile_router
+# from application.routes.followers import router as follower_router
+# from application.routes.userpost import router as post_route
+# from application.routes.like import router as like_route
+# from application.routes.comments import router as comment_route
+# from application.routes.notificationroute import router as notification_route
+# from application.routes.searchuser import router as searching_route
+# from application.routes.storyroute import router as story_route
+# from application.routes.messageroute import router as message_route
+# from application.routes.websocket import router as websocket_router
+# from application.routes.somateChatbot import router as somatebot
+# from application.routes.privacy_req import router as privacy_router
+# from application.db import create_tables  
+
+# app = FastAPI(title="Somates App Backend")
+
+# @app.on_event("startup")
+# def on_startup():
+#     try:
+#         print("Starting up: creating tables...")
+#         create_tables()  
+#         print("Startup finished successfully")
+#     except Exception as e:
+#         import traceback
+#         traceback.print_exc()
+#         raise e
+
+# app.add_middleware(
+#     CORSMiddleware,
+#     allow_origins=["http://localhost:5173",
+#     "https://somates-app.vercel.app"],
+#     allow_credentials=True,
+#     allow_methods=["*"],
+#     allow_headers=["*"],
+# )
+
+# for router in [
+#     signup_router, profile_router, follower_router, post_route,
+#     like_route, comment_route, notification_route, searching_route,
+#     story_route, message_route, websocket_router, somatebot, privacy_router
+# ]:
+#     app.include_router(router)
+
+# @app.get("/home")
+# def homeroute():
+#     return {"message": "Welcome to Somates App"}
+
+#Update code below
+from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+
 from application.routes.signup import router as signup_router
 from application.routes.profile import router as profile_router
 from application.routes.followers import router as follower_router
@@ -72,36 +125,69 @@ from application.routes.messageroute import router as message_route
 from application.routes.websocket import router as websocket_router
 from application.routes.somateChatbot import router as somatebot
 from application.routes.privacy_req import router as privacy_router
-from application.db import create_tables  
+from application.db import create_tables
 
-app = FastAPI(title="Somates App Backend")
 
-@app.on_event("startup")
-def on_startup():
+# ── Lifespan ───────────────────────────────────────────────────────────────
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    print("Starting up: creating tables...")
     try:
-        print("Starting up: creating tables...")
-        create_tables()  
-        print("Startup finished successfully")
+        create_tables()
+        print("Tables ready")
     except Exception as e:
         import traceback
         traceback.print_exc()
         raise e
+    yield
+    print("Shutting down")
 
+
+# ── App ────────────────────────────────────────────────────────────────────
+app = FastAPI(title="Somates App Backend", lifespan=lifespan)
+
+
+# ── CORS — MUST be registered before all routers ──────────────────────────
+# allow_origins must list exact frontend URLs, never "*" when
+# allow_credentials=True — browsers will block cookies if you use "*"
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173",
-    "https://somates-app.vercel.app"],
-    allow_credentials=True,
+    allow_origins=[
+        "http://localhost:5173",          # local dev
+        "http://localhost:3000",          # local dev (alternate port)
+        "https://somates-app.vercel.app", # production frontend
+    ],
+    allow_credentials=True,   # required so cookies are sent cross-origin
     allow_methods=["*"],
     allow_headers=["*"],
+    expose_headers=["*"],     # allows frontend to read response headers
 )
 
-for router in [
-    signup_router, profile_router, follower_router, post_route,
-    like_route, comment_route, notification_route, searching_route,
-    story_route, message_route, websocket_router, somatebot, privacy_router
-]:
-    app.include_router(router)
+
+# ── Routers ────────────────────────────────────────────────────────────────
+app.include_router(signup_router)
+app.include_router(profile_router)
+app.include_router(follower_router)
+app.include_router(post_route)
+app.include_router(like_route)
+app.include_router(comment_route)
+app.include_router(notification_route)
+app.include_router(searching_route)
+app.include_router(story_route)
+app.include_router(message_route)
+app.include_router(websocket_router)
+app.include_router(somatebot)
+app.include_router(privacy_router)
+
+
+# ── Health / root endpoints ────────────────────────────────────────────────
+@app.get("/")
+def root():
+    # Render uses this to check if app is alive.
+    # Without this, Render marks app as unhealthy and restarts it
+    # which causes random login failures for users
+    return {"status": "ok", "app": "Somates"}
+
 
 @app.get("/home")
 def homeroute():
