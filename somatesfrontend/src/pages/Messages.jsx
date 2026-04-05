@@ -377,7 +377,7 @@ function ChatWindow({ user, onBack, navigate }) {
 }
 
 // ── Main Messages Component ────────────────────────────────────────────────
-export default function Messages({ navigate }) {
+export default function Messages({ navigate ,onLogout}) { //code changed here onlogout
   const [users, setUsers] = useState([]);
   const [selected, setSelected] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -461,7 +461,8 @@ useEffect(() => {
               </button>
             ))}
           </nav>
-          <button onClick={()=>{fetch(`${BASE_URL}/logout`,{method:"POST",credentials:"include"}).catch(()=>{});navigate?.("login");}}
+           <button /*onClick={()=>{fetch(`${BASE_URL}/logout`,{method:"POST",credentials:"include"}).catch(()=>{});navigate?.("login");}} */
+             onClick={() => { if (onLogout) onLogout(); }}  
             style={{display:"flex",alignItems:"center",gap:"0.5rem",padding:"0.625rem 0.875rem",borderRadius:"0.75rem",border:"none",cursor:"pointer",background:"transparent",fontSize:"0.875rem",color:T.onVariant,marginTop:"0.5rem"}}
             onMouseEnter={e=>{e.currentTarget.style.background="#fef2f2";e.currentTarget.style.color="#ef4444";}}
             onMouseLeave={e=>{e.currentTarget.style.background="transparent";e.currentTarget.style.color=T.onVariant;}}>
