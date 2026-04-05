@@ -859,7 +859,7 @@ function ViewUserProfile({ userId, onBack, onFollowChange, setViewingUserId }) {
 // Main Profile Component — your own profile
 // ─────────────────────────────────────────────────────────────────────────────
 
-export default function Profile({ navigate }) {
+export default function Profile({ navigate ,onLogout }) {
   const { userId: urlUserId } = useParams();
 
   const [profile, setProfile]               = useState(null);
@@ -1040,10 +1040,10 @@ export default function Profile({ navigate }) {
         ))}
       </nav>
       <button
-        onClick={() => {
+        /* onClick={() => {
           fetch(`${BASE_URL}/logout`, { method:"POST", credentials:"include" }).catch(() => {});
           handleNavigate("login");
-        }}
+        }} */ onClick={() => { if (onLogout) onLogout(); }}
         style={{ marginTop:"0.5rem", display:"flex", alignItems:"center", gap:"0.5rem",
           padding:"0.625rem 0.875rem", borderRadius:"0.75rem", border:"none",
           cursor:"pointer", background:"transparent", fontSize:"0.875rem",
