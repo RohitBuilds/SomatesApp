@@ -70,7 +70,7 @@ const Spinner = () => (
   <div style={{ width:"1.5rem", height:"1.5rem", borderRadius:"9999px", border:"2px solid #cbb6ff", borderTopColor:"#6e3bd8", animation:"spin 0.8s linear infinite" }} />
 );
 
-export default function People(navigate,onLogout) {
+export default function People(onLogout) {
   const navigate = useNavigate();
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
