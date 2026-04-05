@@ -662,7 +662,7 @@ function PeoplePage({ navigate  }) {
 }
 
 // ── Main UserFeed ─────────────────────────────────────────────────────────────
-export default function UserFeed({ navigate }) {
+export default function UserFeed({ navigate , onLogout }) {
   const [activePage, setActivePage] = useState("feed");
   const [posts, setPosts] = useState([]);
   const [stories, setStories] = useState([]);
@@ -702,9 +702,23 @@ export default function UserFeed({ navigate }) {
   const prevStory = () => { if(storyIdx>0)setStoryIdx(storyIdx-1); };
   const handleDeletePost = id => setPosts(p=>p.filter(x=>x.post_id!==id));
 
-  const nav = pg => { if(pg==="followers"){ setActivePage("followers"); return; } navigate?.(pg); };
+  // const nav = pg => { if(pg==="followers"){ setActivePage("followers"); return; } navigate?.(pg); };
+  const nav = pg => {
+  if (pg === "followers") { setActivePage("followers"); return; }
+  if (pg === "logout")    { if (onLogout) onLogout(); return; }
+  navigate?.(pg);
+};
 
-  if (activePage==="followers") return <PeoplePage navigate={pg=>{ if(pg!=="followers"){ setActivePage("feed"); navigate?.(pg); } }}/>;
+  // if (activePage==="followers") return <PeoplePage navigate={pg=>{ if(pg!=="followers"){ setActivePage("feed"); navigate?.(pg); } }}/>;
+  if (activePage==="followers") return (
+  <PeoplePage
+    navigate={pg => {
+      if (pg === "logout") { if (onLogout) onLogout(); return; }
+      if (pg !== "followers") { setActivePage("feed"); navigate?.(pg); }
+    }}
+    onLogout={onLogout}
+  />
+);
 
   const mobileNav = [
     {icon:"grid_view",label:"Feed",page:"feed",active:true},
@@ -740,7 +754,8 @@ export default function UserFeed({ navigate }) {
         </header>
 
         {/* Sidebar */}
-        <Sidebar navigate={nav} active="feed" myProfile={myProfile} unreadCount={unreadCount}/>
+        {/* <Sidebar navigate={nav} active="feed" myProfile={myProfile} unreadCount={unreadCount}/> */}
+        <Sidebar navigate={nav} active="feed" myProfile={myProfile} unreadCount={unreadCount} onLogout={onLogout}/>
 
         {/* Main */}
         <main style={{ paddingTop:"5.5rem", paddingBottom:"6rem", paddingLeft:"1rem", paddingRight:"1rem" }} className="lg:ml-60">
