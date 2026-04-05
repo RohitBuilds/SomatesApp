@@ -100,7 +100,7 @@ function PostResultCard({ post }) {
   );
 }
 
-export default function Search({ navigate }) {
+export default function Search({ navigate ,onLogout }) {
   const [query, setQuery] = useState("");
   const [tab, setTab] = useState("people");
   const [users, setUsers] = useState([]);
@@ -170,7 +170,10 @@ useEffect(() => {
               </button>
             ))}
           </nav>
-          <button onClick={()=>{fetch(`${BASE_URL}/logout`,{method:"POST",credentials:"include"}).catch(()=>{});navigate?.("login");}} style={{display:"flex",alignItems:"center",gap:"0.5rem",padding:"0.625rem 0.875rem",borderRadius:"0.75rem",border:"none",cursor:"pointer",background:"transparent",fontSize:"0.875rem",color:T.onVariant,marginTop:"0.5rem"}} onMouseEnter={e=>{e.currentTarget.style.background="#fef2f2";e.currentTarget.style.color="#ef4444";}} onMouseLeave={e=>{e.currentTarget.style.background="transparent";e.currentTarget.style.color=T.onVariant;}}>
+          <button
+            /* onClick={()=>{fetch(`${BASE_URL}/logout`,{method:"POST",credentials:"include"}).catch(()=>{});navigate?.("login");}}  */
+            onClick={() => { if (onLogout) onLogout(); }}
+            style={{display:"flex",alignItems:"center",gap:"0.5rem",padding:"0.625rem 0.875rem",borderRadius:"0.75rem",border:"none",cursor:"pointer",background:"transparent",fontSize:"0.875rem",color:T.onVariant,marginTop:"0.5rem"}} onMouseEnter={e=>{e.currentTarget.style.background="#fef2f2";e.currentTarget.style.color="#ef4444";}} onMouseLeave={e=>{e.currentTarget.style.background="transparent";e.currentTarget.style.color=T.onVariant;}}>
             <span className="material-symbols-outlined" style={{fontSize:"20px"}}>logout</span>Logout
           </button>
         </aside>
