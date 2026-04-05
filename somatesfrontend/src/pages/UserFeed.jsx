@@ -504,7 +504,7 @@ function PostCard({ post, myUserId, onDelete, myProfile, onNavigate }) {
 }
 
 // ── Sidebar ───────────────────────────────────────────────────────────────────
-function Sidebar({ navigate, active="feed", myProfile, unreadCount=0 }) { 
+function Sidebar({ navigate, active="feed", myProfile, unreadCount=0 , onLogout }) { 
   const navItems = [
     { icon:"grid_view",      label:"Feed",     page:"feed" },
     { icon:"explore",        label:"Search",   page:"search" },
@@ -537,7 +537,9 @@ function Sidebar({ navigate, active="feed", myProfile, unreadCount=0 }) {
           );
         })}
       </nav>
-      <button onClick={()=>{fetch(`${BASE_URL}/logout`,{method:"POST",credentials:"include"}).catch(()=>{});navigate?.("login");}} 
+      <button 
+        /* onClick={()=>{fetch(`${BASE_URL}/logout`,{method:"POST",credentials:"include"}).catch(()=>{});navigate?.("login");}}  */
+        onClick={() => { if (onLogout) onLogout(); }}
         style={{ marginTop:"0.5rem", display:"flex", alignItems:"center", gap:"0.5rem", padding:"0.625rem 0.875rem", borderRadius:"0.75rem", border:"none", cursor:"pointer", background:"transparent", fontSize:"0.875rem", fontWeight:500, color:T.onVariant }} onMouseEnter={e=>{e.currentTarget.style.background="#fef2f2";e.currentTarget.style.color="#ef4444";}} onMouseLeave={e=>{e.currentTarget.style.background="transparent";e.currentTarget.style.color=T.onVariant;}}>
         <span className="material-symbols-outlined" style={{ fontSize:"20px" }}>logout</span>Logout
       </button>
@@ -546,7 +548,7 @@ function Sidebar({ navigate, active="feed", myProfile, unreadCount=0 }) {
 }
 
 // ── People / Followers Page ───────────────────────────────────────────────────
-function PeoplePage({ navigate }) {
+function PeoplePage({ navigate  }) {
   const [users, setUsers] = useState([]);
   const [myProfile, setMyProfile] = useState(null);
   const [loading, setLoading] = useState(true);
