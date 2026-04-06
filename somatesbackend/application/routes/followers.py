@@ -9,6 +9,38 @@ from application.models.follow import Follow
 
 router = APIRouter()
 
+# @router.post("/following/{user_id}")
+# def follow(user_id: int, request: Request, db: Session = Depends(get_db)):
+
+#     session_user = request.cookies.get("session_id")
+#     if not session_user:
+#         raise HTTPException(status_code=401, detail="Not logged in")
+
+#     current_user_id = int(session_user)
+
+   
+#     if current_user_id == user_id:
+#         raise HTTPException(status_code=400, detail="You cannot follow yourself")
+
+    
+#     existing = db.query(Follow).filter(
+#         Follow.follower_id == current_user_id,
+#         Follow.following_id == user_id
+#     ).first()
+
+#     if existing:
+#         return {"message": "Already following"}
+
+#     follow = Follow(
+#         follower_id=current_user_id,
+#         following_id=user_id
+#     )
+
+#     db.add(follow)
+#     db.commit()
+
+#     return {"message": "Followed successfully"}
+
 @router.post("/following/{user_id}")
 def follow(user_id: int, request: Request, db: Session = Depends(get_db)):
 
@@ -18,19 +50,51 @@ def follow(user_id: int, request: Request, db: Session = Depends(get_db)):
 
     current_user_id = int(session_user)
 
-   
     if current_user_id == user_id:
         raise HTTPException(status_code=400, detail="You cannot follow yourself")
 
-    
+    # ✅ Get target user
+    target_user = db.query(User).filter(User.id == user_id).first()
+    if not target_user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    # ✅ Check already following
     existing = db.query(Follow).filter(
         Follow.follower_id == current_user_id,
         Follow.following_id == user_id
     ).first()
 
     if existing:
-        return {"message": "Already following"}
+        return {"status": "following"}
 
+    # 🔥 MAIN FIX: CHECK PRIVATE ACCOUNT
+    if getattr(target_user, "is_private", False):
+
+        from application.models.follow_request import FollowRequest  # ✅ import here
+
+        # check existing request
+        existing_req = db.query(FollowRequest).filter(
+            FollowRequest.requester_id == current_user_id,
+            FollowRequest.requested_id == user_id,
+            FollowRequest.status == "pending"
+        ).first()
+
+        if existing_req:
+            return {"status": "pending"}
+
+        # create new request
+        new_req = FollowRequest(
+            requester_id=current_user_id,
+            requested_id=user_id,
+            status="pending"
+        )
+
+        db.add(new_req)
+        db.commit()
+
+        return {"status": "request_sent"}
+
+    # ✅ PUBLIC USER → FOLLOW DIRECTLY
     follow = Follow(
         follower_id=current_user_id,
         following_id=user_id
@@ -39,7 +103,8 @@ def follow(user_id: int, request: Request, db: Session = Depends(get_db)):
     db.add(follow)
     db.commit()
 
-    return {"message": "Followed successfully"}
+    return {"status": "following"}
+
 
 @router.get("/followers/{user_id}")
 def get_followers(user_id: int, db: Session = Depends(get_db)):
