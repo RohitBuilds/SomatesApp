@@ -75,7 +75,10 @@ def login(data: LoginRequest, response: Response, db: Session = Depends(get_db))
 @router.post("/logout")
 def logout(response: Response):
 
-    response.delete_cookie("session_id")
+    response.delete_cookie(
+        key="session_id",
+        path='/'
+    )
 
     return {"message": "Logged out successfully"}
 
