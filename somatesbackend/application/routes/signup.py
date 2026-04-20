@@ -46,15 +46,28 @@ def login(data: LoginRequest, response: Response, db: Session = Depends(get_db))
     #     samesite="lax",  
     #     path="/",        
     # )
+    
+    # response.set_cookie(
+    #     key="session_id",
+    #     value=str(user.id),
+    #     httponly=True,
+    #     samesite="none",   # ✅ CHANGED from "lax" to "none" (cross-origin)
+    #     secure=True,       # ✅ REQUIRED when samesite="none"
+    #     path="/",
+    #     max_age=60*60*24*7  # ✅ ADD: 7 days expiry
+    # )
+    #New code after fix for iphone
     response.set_cookie(
-        key="session_id",
-        value=str(user.id),
-        httponly=True,
-        samesite="none",   # ✅ CHANGED from "lax" to "none" (cross-origin)
-        secure=True,       # ✅ REQUIRED when samesite="none"
-        path="/",
-        max_age=60*60*24*7  # ✅ ADD: 7 days expiry
-    )
+    key="session_id",
+    value=str(user.id),
+    httponly=True,
+    samesite="none",
+    secure=True,
+    path="/",
+    domain="somatesappbackend.onrender.com",  # ⭐ ADD THIS LINE
+    max_age=60*60*24*7
+)
+
 
     return {"message": "Login successful"}
 
