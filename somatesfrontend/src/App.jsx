@@ -400,12 +400,29 @@ const BASE_URL = import.meta.env.VITE_API_URL || "https://somatesappbackend.onre
 function useAuth() {
   const [status, setStatus] = useState("loading");
 
+  // const checkAuth = useCallback(() => {
+  //   setStatus("loading");
+  //   return fetch(`${BASE_URL}/me`, { credentials: "include" })
+  //     .then(res => setStatus(res.ok ? "auth" : "unauth"))
+  //     .catch(() => setStatus("unauth"));
+  // }, []);
+  
+  //New code below 
   const checkAuth = useCallback(() => {
-    setStatus("loading");
-    return fetch(`${BASE_URL}/me`, { credentials: "include" })
-      .then(res => setStatus(res.ok ? "auth" : "unauth"))
-      .catch(() => setStatus("unauth"));
-  }, []);
+  setStatus("loading");
+
+  const user_id = localStorage.getItem("user_id"); // ⭐ fallback
+
+  return fetch(`${BASE_URL}/me`, {
+    credentials: "include", // keep cookies
+    headers: {
+      ...(user_id && { "user_id": user_id }) // ⭐ only send if exists
+    },
+  })
+    .then(res => setStatus(res.ok ? "auth" : "unauth"))
+    .catch(() => setStatus("unauth"));
+}, []);
+
 
   useEffect(() => { checkAuth(); }, [checkAuth]);
 
