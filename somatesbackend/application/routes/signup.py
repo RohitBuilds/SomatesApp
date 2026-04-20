@@ -86,6 +86,7 @@ def logout(response: Response):
         samesite="none",  
         secure=True,       
         path="/",
+        domain=".onrender.com",
     )
     return {"message": "Logged out successfully"}
 
