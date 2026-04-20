@@ -72,23 +72,25 @@ def login(data: LoginRequest, response: Response, db: Session = Depends(get_db))
     return {"message": "Login successful"}
 
 
-# @router.post("/logout")
-# def logout(response: Response):
-
-#     response.delete_cookie("session_id")
-
-#     return {"message": "Logged out successfully"}
 @router.post("/logout")
 def logout(response: Response):
-    response.delete_cookie(
-        key="session_id",
-        httponly=True,
-        samesite="none",  
-        secure=True,       
-        path="/",
-        domain="somatesappbackend.onrender.com",
-    )
+
+    response.delete_cookie("session_id")
+
     return {"message": "Logged out successfully"}
+
+
+# @router.post("/logout")
+# def logout(response: Response):
+#     response.delete_cookie(
+#         key="session_id",
+#         httponly=True,
+#         samesite="none",  
+#         secure=True,       
+#         path="/",
+#         domain="somatesappbackend.onrender.com",
+#     )
+#     return {"message": "Logged out successfully"}
 
 
 @router.get("/getalluser")
