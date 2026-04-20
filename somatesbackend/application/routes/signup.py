@@ -38,14 +38,14 @@ def login(data: LoginRequest, response: Response, db: Session = Depends(get_db))
     if not user or not verify_password(data.password, user.password):
         raise HTTPException(status_code=401, detail="Invalid credentials")
 
-    Set cookie
-    response.set_cookie(
-        key="session_id",
-        value=str(user.id),
-        httponly=True,
-        samesite="lax",  
-        path="/",        
-    )
+    # Set cookie
+    # response.set_cookie(
+    #     key="session_id",
+    #     value=str(user.id),
+    #     httponly=True,
+    #     samesite="lax",  
+    #     path="/",        
+    # )
     
     response.set_cookie(
         key="session_id",
