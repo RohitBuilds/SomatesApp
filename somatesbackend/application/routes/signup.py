@@ -54,7 +54,7 @@ def login(data: LoginRequest, response: Response, db: Session = Depends(get_db))
         samesite="none",   # ✅ CHANGED from "lax" to "none" (cross-origin)
         secure=True,       # ✅ REQUIRED when samesite="none"
         path="/",
-        max_age=60*60*24*7  # ✅ ADD: 7 days expiry
+        # max_age=60*60*24*7  # ✅ ADD: 7 days expiry
     )
     #New code after fix for iphone
 #     response.set_cookie(
