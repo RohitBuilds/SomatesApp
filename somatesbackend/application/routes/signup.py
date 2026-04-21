@@ -88,8 +88,7 @@ def me(request: Request, db: Session = Depends(get_db)):
         raise HTTPException(status_code=401, detail="Invalid session")
     if not user:
         raise HTTPException(status_code=401, detail="User not found")
-    return {"id": user.id, "name": user.name, "email": user.email,"profilepic": user.profilepic,"bio": user.bio, "followers": followers_count,
-            "following": following_count,}
+    return {"id": user.id, "name": user.name, "email": user.email}
 
     #  # ✅ Count followers and following
     # from application.models.follow_request import Follow  # adjust import to your model
