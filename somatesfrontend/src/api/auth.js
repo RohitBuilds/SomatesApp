@@ -1,44 +1,67 @@
 import axios from "axios";
 const BASE_URL = "https://somatesappbackend.onrender.com";
 
-export const loginUser = async (email, password) => {
-  console.log("Sending login:", email, password); // debug
+// export const loginUser = async (email, password) => {
+//   console.log("Sending login:", email, password); // debug
 
+//   try {
+//     const res = await fetch(`${BASE_URL}/login`, {
+//       method: "POST",
+//       headers: {
+//         "Content-Type": "application/json"
+//       },
+//       credentials: "include", 
+//       body: JSON.stringify({ email, password })
+//     });
+
+//     const data = await res.json();
+
+//     if (!res.ok) {
+//       console.log("ERROR RESPONSE:", data);
+
+//       // If FastAPI returns validation errors array
+//       if (data.detail && Array.isArray(data.detail)) {
+//         throw data.detail[0].msg;
+//       }
+
+//       throw data.detail || "Login failed";
+//     }
+
+//     return data; // { message: "Login successful" }
+//   } catch (err) {
+//     console.error("Login error:", err);
+//     throw typeof err === "string" ? err : "Login failed";
+//   }
+// };
+
+export const loginUser = async (email, password) => {
   try {
     const res = await fetch(`${BASE_URL}/login`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      credentials: "include", 
-      body: JSON.stringify({ email, password })
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify({ email, password }),
     });
-
     const data = await res.json();
-
     if (!res.ok) {
-      console.log("ERROR RESPONSE:", data);
-
-      // If FastAPI returns validation errors array
-      if (data.detail && Array.isArray(data.detail)) {
-        throw data.detail[0].msg;
-      }
-
+      if (data.detail && Array.isArray(data.detail)) throw data.detail[0].msg;
       throw data.detail || "Login failed";
     }
-
-    return data; // { message: "Login successful" }
+    
+    if (data.user_id) localStorage.setItem("uid", data.user_id);
+    return data;
   } catch (err) {
     console.error("Login error:", err);
     throw typeof err === "string" ? err : "Login failed";
   }
 };
 
+
 export const fetchWithSession = async (endpoint, options = {}) => {
   try {
     const res = await fetch(`${BASE_URL}${endpoint}`, {
       ...options,
-      credentials: "include", // ✅ important for session auth
+      credentials: "include", 
       headers: {
         "Content-Type": "application/json",
         ...(options.headers || {}),
