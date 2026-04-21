@@ -88,35 +88,36 @@ def me(request: Request, db: Session = Depends(get_db)):
         raise HTTPException(status_code=401, detail="Invalid session")
     if not user:
         raise HTTPException(status_code=401, detail="User not found")
-    # return {"id": user.id, "name": user.name, "email": user.email}
+    return {"id": user.id, "name": user.name, "email": user.email,"profilepic": user.profilepic,"bio": user.bio, "followers": followers_count,
+            "following": following_count,}
 
-     # ✅ Count followers and following
-    from application.models.follow_request import Follow  # adjust import to your model
-    followers_count = db.query(Follow).filter(Follow.followed_id == user.id).count()
-    following_count = db.query(Follow).filter(Follow.follower_id == user.id).count()
+    #  # ✅ Count followers and following
+    # from application.models.follow_request import Follow  # adjust import to your model
+    # followers_count = db.query(Follow).filter(Follow.followed_id == user.id).count()
+    # following_count = db.query(Follow).filter(Follow.follower_id == user.id).count()
 
-    # ✅ Get user's posts
-    from application.models.post import Post  # adjust import to your model
-    posts = db.query(Post).filter(Post.user_id == user.id).order_by(Post.created_at.desc()).all()
+    # # ✅ Get user's posts
+    # from application.models.post import Post  # adjust import to your model
+    # posts = db.query(Post).filter(Post.user_id == user.id).order_by(Post.created_at.desc()).all()
 
-    return {
-        "id": user.id,
-        "name": user.name,
-        "email": user.email,
-        "profilepic": user.profilepic,   # ✅ must match your DB column name
-        "bio": user.bio,                  # ✅ must match your DB column name
-        "followers": followers_count,
-        "following": following_count,
-        "posts": [
-            {
-                "id": p.id,
-                "post_id": p.id,
-                "content": p.content,
-                "image_url": p.image_url,
-                "created_at": str(p.created_at),
-                "likes": 0,
-                "comments": 0,
-            }
-            for p in posts
-        ],
-    }
+    # return {
+    #     "id": user.id,
+    #     "name": user.name,
+    #     "email": user.email,
+    #     "profilepic": user.profilepic,   # ✅ must match your DB column name
+    #     "bio": user.bio,                  # ✅ must match your DB column name
+    #     "followers": followers_count,
+    #     "following": following_count,
+    #     "posts": [
+    #         {
+    #             "id": p.id,
+    #             "post_id": p.id,
+    #             "content": p.content,
+    #             "image_url": p.image_url,
+    #             "created_at": str(p.created_at),
+    #             "likes": 0,
+    #             "comments": 0,
+    #         }
+    #         for p in posts
+    #     ],
+    # }
