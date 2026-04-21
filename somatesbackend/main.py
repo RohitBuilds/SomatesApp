@@ -156,8 +156,8 @@ app.add_middleware(
         "http://localhost:5173",          # local dev
         "http://localhost:3000",          # local dev (alternate port)
         "https://somates-app.vercel.app", # production frontend
-        "https://somates-app-git-main-rohit-kumars-projects-793a0646.vercel.app",    
-        "https://somates-bzx0sbkkj-rohit-kumars-projects-793a0646.vercel.app", 
+        # "https://somates-app-git-main-rohit-kumars-projects-793a0646.vercel.app",    
+        # "https://somates-bzx0sbkkj-rohit-kumars-projects-793a0646.vercel.app", 
     ],
     allow_credentials=True,   # required so cookies are sent cross-origin
     allow_methods=["*"],
