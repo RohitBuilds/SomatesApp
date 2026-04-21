@@ -31,69 +31,35 @@ def signup(user: UserCreate, db: Session = Depends(get_db)):
     return {"message": "User created"}
 
 
+#New login code 
 @router.post("/login")
 def login(data: LoginRequest, response: Response, db: Session = Depends(get_db)):
     user = db.query(User).filter(User.email == data.email).first()
-
     if not user or not verify_password(data.password, user.password):
         raise HTTPException(status_code=401, detail="Invalid credentials")
 
-    # Set cookie
-    # response.set_cookie(
-    #     key="session_id",
-    #     value=str(user.id),
-    #     httponly=True,
-    #     samesite="lax",  
-    #     path="/",        
-    # )
-    
     response.set_cookie(
         key="session_id",
         value=str(user.id),
         httponly=True,
-        samesite="none",   # ✅ CHANGED from "lax" to "none" (cross-origin)
-        secure=True,       # ✅ REQUIRED when samesite="none"
+        samesite="none",
+        secure=True,
         path="/",
-        # max_age=60*60*24*7  # ✅ ADD: 7 days expiry
+        max_age=60*60*24*7   
     )
-    #New code after fix for iphone
-#     response.set_cookie(
-#     key="session_id",
-#     value=str(user.id),
-#     httponly=True,
-#     samesite="none",
-#     secure=True,
-#     path="/",
-#     domain="somatesappbackend.onrender.com",  # ⭐ ADD THIS LINE
-#     max_age=60*60*24*7
-# )
+    return {"message": "Login successful", "user_id": str(user.id)}
 
-
-    return {"message": "Login successful"}
-
-
+#New code
 @router.post("/logout")
 def logout(response: Response):
-
     response.delete_cookie(
         key="session_id",
-        path='/'
+        httponly=True,
+        samesite="none",  
+        secure=True,       
+        path="/",
     )
-
     return {"message": "Logged out successfully"}
-
-
-# @router.post("/logout")
-# def logout(response: Response):
-#     response.delete_cookie(
-#         key="session_id",
-#         httponly=True,
-#         samesite="none",  
-#         secure=True,       
-#         path="/",
-#         domain="somatesappbackend.onrender.com",
-#     )
-#     return {"message": "Logged out successfully"}
 
 
 @router.get("/getalluser")
@@ -109,3 +75,17 @@ def get_all_users(request: Request, db: Session = Depends(get_db)):
 def get_all_users_db(db: Session = Depends(get_db)):
     users = db.query(User).all()
     return users
+
+
+@router.get("/me")
+def me(request: Request, db: Session = Depends(get_db)):
+    session_id = request.cookies.get("session_id")
+    if not session_id:
+        raise HTTPException(status_code=401, detail="Not authenticated")
+    try:
+        user = db.query(User).filter(User.id == int(session_id)).first()
+    except (ValueError, Exception):
+        raise HTTPException(status_code=401, detail="Invalid session")
+    if not user:
+        raise HTTPException(status_code=401, detail="User not found")
+    return {"id": user.id, "name": user.name, "email": user.email}
