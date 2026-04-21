@@ -400,12 +400,36 @@ const BASE_URL = import.meta.env.VITE_API_URL || "https://somatesappbackend.onre
 function useAuth() {
   const [status, setStatus] = useState("loading");
 
+  //new code
   const checkAuth = useCallback(() => {
-    setStatus("loading");
-    return fetch(`${BASE_URL}/me`, { credentials: "include" })
-      .then(res => setStatus(res.ok ? "auth" : "unauth"))
-      .catch(() => setStatus("unauth"));
-  }, []);
+  setStatus("loading");
+  const uid = localStorage.getItem("uid"); // iPhone fallback
+  return fetch(`${BASE_URL}/me`, {
+    credentials: "include",
+    headers: {
+      ...(uid && { "x-user-id": uid }), // ✅ sent only when cookie blocked
+    },
+  })
+    .then(res => {
+      if (!res.ok) {
+        localStorage.removeItem("uid"); // clear stale fallback
+        setStatus("unauth");
+      } else {
+        setStatus("auth");
+      }
+    })
+    .catch(() => {
+      localStorage.removeItem("uid");
+      setStatus("unauth");
+    });
+}, []);
+
+  // const checkAuth = useCallback(() => {
+  //   setStatus("loading");
+  //   return fetch(`${BASE_URL}/me`, { credentials: "include" })
+  //     .then(res => setStatus(res.ok ? "auth" : "unauth"))
+  //     .catch(() => setStatus("unauth"));
+  // }, []);
   
   //New code below 
 //   const checkAuth = useCallback(() => {
@@ -505,20 +529,31 @@ function App() {
   const [logoutKey, setLogoutKey] = useState(0);
 
   // Called by any logout button anywhere in the app
-  const handleLogout = useCallback(async () => {
-    try {
-      await fetch(`${BASE_URL}/logout`, {
-        method: "POST",
-        credentials: "include",
-      });
-    } catch {
-      // even if request fails, clear local auth state
-    }
-    // Force auth status to unauth immediately — don't wait for /me check
-    setLogoutKey(k => k + 1); // forces re-render
-    await checkAuth();         // syncs with server
-  }, [checkAuth]);
+  // const handleLogout = useCallback(async () => {
+  //   try {
+  //     await fetch(`${BASE_URL}/logout`, {
+  //       method: "POST",
+  //       credentials: "include",
+  //     });
+  //   } catch {
+  //     // even if request fails, clear local auth state
+  //   }
+  //   // Force auth status to unauth immediately — don't wait for /me check
+  //   setLogoutKey(k => k + 1); // forces re-render
+  //   await checkAuth();         // syncs with server
+  // }, [checkAuth]);
 
+  const handleLogout = useCallback(async () => {
+  try {
+    await fetch(`${BASE_URL}/logout`, {
+      method: "POST",
+      credentials: "include",
+    });
+  } catch { /* still clear local state */ }
+  localStorage.removeItem("uid"); // ✅ clear iPhone fallback
+  setLogoutKey(k => k + 1);
+  await checkAuth();
+  }, [checkAuth]);
   return (
     // key={logoutKey} forces BrowserRouter to remount after logout,
     // which clears all history so back button cannot re-enter the app
